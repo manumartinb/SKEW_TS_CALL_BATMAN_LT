@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SKEW TS CALL - Semaforo canal superficie Batman LT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root {
+  --bg: #0d1117;
+  --panel: #161b22;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+  --border: #30363d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px;
+}
+.obs-banner {
+  max-width: 1200px;
+  margin: 0 auto 14px auto;
+  background: rgba(210,153,34,0.10);
+  border: 1px solid #9a6700;
+  border-left: 4px solid #d29922;
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #e3b341;
+}
+.obs-banner strong { color: #f0d264; }
+.obs-banner .sub { color: #b08a2e; font-size: 12px; }
+.header {
+  max-width: 1200px;
+  margin: 0 auto 16px auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+h1 { font-size: 18px; margin: 0; font-weight: 600; }
+.subtitle { color: var(--muted); font-size: 13px; margin-top: 2px; }
+.latest {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  min-width: 250px;
+}
+.latest .v { font-size: 26px; font-weight: 700; }
+.latest .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+.zone {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.zone.TURBO  { background: rgba(63,185,80,0.35);  color: #7ee787; border: 1px solid #3fb950; }
+.zone.VERDE  { background: rgba(26,127,55,0.20);  color: #3fb950; }
+.zone.NEUTRA { background: rgba(154,103,0,0.20);  color: #d29922; }
+.zone.ROJA   { background: rgba(207,34,46,0.20);  color: #f85149; }
+.zone.INDETERMINADO { background: rgba(139,148,158,0.2); color: #8b949e; }
+.stale-pill {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 10.5px;
+  font-weight: 600;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.stale-pill.ok   { background: rgba(139,148,158,0.15); color: #8b949e; }
+.stale-pill.warn { background: rgba(154,103,0,0.25);   color: #d29922; }
+.stale-pill.bad  { background: rgba(207,34,46,0.25);   color: #f85149; }
+#chart {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+}
+.rules {
+  max-width: 1200px;
+  margin: 18px auto;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 20px 14px 20px;
+}
+.rules h2 { font-size: 15px; margin: 0 0 8px 0; font-weight: 600; }
+.rules p { font-size: 13px; line-height: 1.55; color: #b6bec9; margin: 4px 0; }
+.rules code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: #21262d;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+  color: var(--text);
+}
+.rules-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin: 8px 0 4px 0;
+}
+.rules-table th, .rules-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+.rules-table thead th { background: #21262d; color: var(--text); font-weight: 600; font-size: 11.5px; }
+.rules-table th:first-child, .rules-table td:first-child { text-align: left; font-weight: 500; }
+.rules-table tr.row-turbo td:first-child { color: #7ee787; font-weight: 700; }
+.rules-table tr.row-verde td:first-child { color: #3fb950; font-weight: 600; }
+.rules-table tr.row-neu   td:first-child { color: #d29922; font-weight: 600; }
+.rules-table tr.row-roja  td:first-child { color: #f85149; font-weight: 600; }
+#evidence {
+  max-width: 1200px;
+  margin: 28px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.ev-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 20px 24px;
+}
+.ev-card h2 { font-size: 17px; margin: 0 0 4px 0; color: var(--text); font-weight: 600; }
+.ev-card .ev-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 10px;
+}
+.ev-card p { font-size: 13.5px; line-height: 1.65; color: #b6bec9; margin: 8px 0; }
+.ev-card p strong { color: var(--text); }
+.ev-card img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 14px auto;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.ev-card ul { font-size: 13.5px; line-height: 1.65; color: #b6bec9; margin: 8px 0; padding-left: 22px; }
+.ev-card ul li { margin: 4px 0; }
+.ev-callout {
+  background: #21262d;
+  border-left: 3px solid #58a6ff;
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: #c9d1d9;
+  margin: 12px 0;
+}
+.ev-callout.warn { border-left-color: #d29922; }
+.ev-callout.good { border-left-color: #3fb950; }
+.ev-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  margin: 12px 0 4px 0;
+}
+.ev-table th, .ev-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+}
+.ev-table thead th { background: #21262d; color: var(--text); font-weight: 600; border-bottom: 1px solid #444c56; }
+.ev-table tbody tr:hover { background: rgba(88,166,255,0.06); }
+.ev-table th:first-child, .ev-table td:first-child { text-align: left; }
+.ev-kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.ev-kpi-tile {
+  background: #21262d;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.ev-kpi-tile .v { font-size: 18px; font-weight: 700; color: var(--text); }
+.ev-kpi-tile .l { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
+.footer {
+  max-width: 1200px;
+  margin: 14px auto 0 auto;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+.footer a { color: #58a6ff; text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+.error { color: #f85149; text-align: center; padding: 40px; font-family: monospace; }
+@media (max-width: 760px) { .ev-card { padding: 16px 16px; } }
+</style>
+</head>
+<body>
+
+<div class="obs-banner">
+  <strong>&#9888; FASE DE OBSERVACION</strong> &mdash; Senal certificada en backtest (Gen 3, horizonte
+  W50 real, 2019-2026) y en rodaje LIVE desde el <strong>2026-07-07</strong> sin poder sobre sizing.
+  Su rol es <strong>semaforo diario (gate/tilt)</strong>, nunca ranking de estructuras dentro del dia.<br>
+  <span class="sub">El guardian de stress (PUT_SKEW / TRIPLE_OR) manda SIEMPRE por encima de este gate:
+  en la peor racha historica (jul-2022 a feb-2023) esta senal silencio su verde pero NO evacua.</span>
+</div>
+
+<div class="header">
+  <div>
+    <h1>SKEW TS CALL - Semaforo canal superficie Batman LT</h1>
+    <div class="subtitle">Term structure del skew de CALLs SPX (back - front) - basket dte 400 vs {250, 300, 200} - percentil expanding asof</div>
+  </div>
+  <div class="latest">
+    <div class="label">Ultimo dato <span id="latest-date"></span><span class="stale-pill ok" id="stale-pill" style="display:none">--</span></div>
+    <div><span class="v" id="latest-value">--</span><span class="zone" id="latest-zone">--</span></div>
+    <div class="label" style="margin-top:4px">raw <span id="latest-raw" style="color:#c9d1d9">--</span></div>
+  </div>
+</div>
+
+<div id="chart"><div class="error">Cargando...</div></div>
+
+<div class="rules">
+  <h2>Que mide y como leerlo</h2>
+  <p>
+    Cuando la prima del skew de CALLs esta concentrada en la expiracion <strong>BACK</strong> (donde el
+    Batman LT COMPRA el body x2) y no en la front (donde VENDE los wings), la estructura compra donde la
+    superficie esta sostenida y vende donde se desinfla. Formula cerrada, sin percentiles en el input:
+    <code>skew_25d_vs50[back] - skew_25d_vs50[front]</code>; el percentil expanding (solo-pasado) traduce
+    el nivel a zonas operativas.
+  </p>
+  <table class="rules-table">
+    <thead><tr><th>Zona</th><th>Percentil</th><th>Lectura operativa</th><th>Elite P90 backtest (Gen3 / Madre)</th></tr></thead>
+    <tbody>
+      <tr class="row-turbo"><td>TURBO</td><td>&ge; 95</td><td style="text-align:left">Maxima prioridad / sobre-ponderar</td><td>PF 52.4 / 48.4 &middot; CVaR5 -29 / -43</td></tr>
+      <tr class="row-verde"><td>VERDE</td><td>&ge; 80</td><td style="text-align:left">Acelerar (umbral validado dentro de elite TX_V7)</td><td>PF 40.7 / 647 en elite TX</td></tr>
+      <tr class="row-neu"><td>NEUTRA</td><td>20 - 80</td><td style="text-align:left">Operar normal (decide el sort)</td><td>&mdash;</td></tr>
+      <tr class="row-roja"><td>ROJA</td><td>&le; 20</td><td style="text-align:left">Reducir / no abrir</td><td>WR 53-58% en Madre (casi moneda al aire)</td></tr>
+    </tbody>
+  </table>
+  <p style="color:#8b949e; font-size:12px">
+    Nota: la respuesta economica NO es lineal &mdash; standalone el salto real esta en P90; operando la
+    elite TX_V7 (caso real) el liston baja a P80. Detalle completo en la seccion de evidencia.
+  </p>
+</div>
+
+<div id="evidence">
+
+  <div class="ev-card">
+    <span class="ev-tag">1 &middot; Origen y validacion</span>
+    <h2>De donde sale esta senal</h2>
+    <p>
+      Descubierta en la busqueda masiva <strong>CazaEdge "venta cara / compra barata"</strong> (2026-07-06):
+      ~105 candidatos en 5 familias (theta por pata, riqueza IV, superficie CALL 3D, economia del credito,
+      interacciones), evaluados contra una puerta de 8 tests anti-overfit en DOS universos de backtest
+      (Gen 3 brazo neutro: 511.389 trades / 1.811 dias; Madre TRUE: 46.126 / 1.614 dias).
+      <strong>Fue el UNICO candidato que paso la puerta completa</strong> &mdash; en tres evaluaciones independientes.
+    </p>
+    <div class="ev-kpi">
+      <div class="ev-kpi-tile"><div class="v">8/8 &times;3</div><div class="l">Puerta de validacion</div></div>
+      <div class="ev-kpi-tile"><div class="v">+0.39 / +0.40</div><div class="l">r_dia vs W50 (Gen3 / Madre)</div></div>
+      <div class="ev-kpi-tile"><div class="v">8/8 y 5/6</div><div class="l">Anios positivos (LOYO)</div></div>
+      <div class="ev-kpi-tile"><div class="v">p = 0.000</div><div class="l">Permutacion (ambos)</div></div>
+      <div class="ev-kpi-tile"><div class="v">[+0.34, +0.43]</div><div class="l">Bootstrap-por-dia CI95</div></div>
+      <div class="ev-kpi-tile"><div class="v">3/3</div><div class="l">Terciles VIX con edge</div></div>
+    </div>
+  </div>
+
+  <div class="ev-card">
+    <span class="ev-tag">2 &middot; La prueba reina</span>
+    <h2>Incremental dentro de la elite TX_V7 (el test que mata candidatos)</h2>
+    <p>
+      Tomar la elite P90 del sort YA en produccion (TX_V7) y partirla por la mediana de la senal nueva.
+      Si la mitad "senal alta" no es mejor, la senal no anade nada operable. Resultado, consistente en
+      ambos universos: <strong>los dias de senal alta concentran practicamente todo el profit factor y
+      reducen la cola a 1/6 - 1/14</strong>.
+    </p>
+    <table class="ev-table">
+      <thead><tr><th></th><th colspan="3">GEN3</th><th colspan="3">MADRE (TRUE)</th></tr>
+      <tr><th>Mitad de la elite TX</th><th>mediana</th><th>PF</th><th>CVaR5</th><th>mediana</th><th>PF</th><th>CVaR5</th></tr></thead>
+      <tbody>
+        <tr><td style="color:#3fb950;font-weight:600">Senal ALTA</td><td>+76.9</td><td><b>65.2</b></td><td><b>-19.5</b></td><td>+97.9</td><td><b>248.2</b></td><td><b>-5.4</b></td></tr>
+        <tr><td style="color:#f85149">Senal baja</td><td>+62.4</td><td>5.9</td><td>-122.2</td><td>+88.7</td><td>18.5</td><td>-78.3</td></tr>
+      </tbody>
+    </table>
+    <img src="evidence/incremental_elite_tx.png" alt="Incremental elite TX_V7" loading="lazy">
+    <p style="color:#8b949e;font-size:12px">La mediana apenas cambia entre mitades: la senal no elige trades
+    "mas rentables", elige dias sin accidentes. Por eso es un gate de sizing, no un ranker.</p>
+  </div>
+
+  <div class="ev-card">
+    <span class="ev-tag">3 &middot; Stress test</span>
+    <h2>La peor racha (jul-2022 a feb-2023): que hizo ex-ante</h2>
+    <p>
+      Durante los 149 dias del peor drawdown historico de Batman LT (-6.492 pts en mediana diaria),
+      el semaforo <strong>NO fue alarma de evacuacion</strong> (64% de los dias en NEUTRA) pero
+      <strong>silencio el acelerador por completo: solo 2 dias VERDE en 7 meses (1%)</strong> frente al
+      11% habitual. Con el sizing atado al semaforo se pasa la racha entera en tamano minimo.
+      Al salir de la racha el verde reaparece (8%) con mediana diaria +20.
+    </p>
+    <img src="evidence/stress_2022_exante.png" alt="Stress 2022 ex-ante" loading="lazy">
+    <div class="ev-callout warn">
+      Leccion operativa: este gate es un <strong>acelerador inteligente, no un freno de emergencia</strong>.
+      La proteccion de cola en stress la dan los guardianes ya cableados (PUT_SKEW / TRIPLE_OR), que
+      estuvieron cerrados (ON 0-1%) durante toda esa racha.
+    </div>
+  </div>
+
+  <div class="ev-card">
+    <span class="ev-tag">4 &middot; Niveles y pulso</span>
+    <h2>Niveles por anio + pulso semanal vs PnL temprano</h2>
+    <p>
+      Distribucion de la senal por anio (2020 vivio estructuralmente alto; 2021-2024 frios; 2025-2026
+      volviendo a niveles medios-altos) y el pulso semanal: el PnL medio de la trayectoria temprana
+      (d001-d100) de los trades abiertos cada semana, coloreado por la zona del semaforo esa semana.
+      <strong>Mediana semanal: VERDE +22.7 pts vs NEUTRA +7.8 vs ROJA +6.0</strong> &mdash; las semanas
+      verdes parieron trades ~3x mejores.
+    </p>
+    <img src="evidence/niveles_pulso_semanal.png" alt="Niveles por anio y pulso semanal" loading="lazy">
+  </div>
+
+  <div class="ev-card">
+    <span class="ev-tag">5 &middot; Honestidad</span>
+    <h2>Caveats (los mismos que en el dossier interno)</h2>
+    <ul>
+      <li><strong>Carga VIX +0.21:</strong> pasa el umbral de descubrimiento (0.25) pero fallaria una
+      certificacion formal como score (0.20). Por eso es GATE declarado, no score. Mitigante: el edge
+      vive en los 3 terciles de VIX (no es regimen disfrazado).</li>
+      <li><strong>Solape con PUT_SKEW:</strong> comparte ~0.54 de varianza diaria con el regimen ya
+      cableado. El partial (+0.11/+0.14) y el incremental demuestran que anade, pero es el complemento
+      del PUT_SKEW, no su sustituto (partial inverso 0.40).</li>
+      <li><strong>Origen de la orientacion:</strong> nacio de un flip en la ronda 1; quedo pre-registrada
+      y re-confirmada en ronda 2 sobre los mismos datos historicos. La confirmacion independiente es el
+      rodaje LIVE que empieza ahora (0 dias OOS reales a fecha de publicacion).</li>
+      <li><strong>Economia concentrada en 2020:</strong> el PF agregado del backtest esta dominado por
+      2020; 2022 sobrevive de milagro (PF 1.7 en la conjuncion triple). Anios recientes con N fino.</li>
+      <li><strong>Serie del dashboard:</strong> basket fijo de 3 pares dte (400 vs 250/300/200),
+      reproducible solo desde el grid de superficie; el gate por-trade del sistema LIVE usa el par
+      exacto de cada estructura y tiene ~2/3 de trades en zona muerta (clamp) en el universo actual.</li>
+    </ul>
+  </div>
+
+  <div class="ev-card">
+    <span class="ev-tag">6 &middot; Trazabilidad</span>
+    <h2>Pipeline y fuentes</h2>
+    <p>
+      Fuente: grid de superficie CALL SPX (dia x dte_target, snapshot 10:30 ET), reconstruido a diario
+      desde datos de opciones propios. Serie: <code>mean(skew_25d_vs50[400] - skew_25d_vs50[f])</code>
+      para f en {250, 300, 200}; percentil expanding solo-pasado (min 250 obs). Este dashboard se
+      actualiza automaticamente tras el pipeline diario; si el dato envejece, la pill de staleness
+      junto al ultimo dato lo indica (el sistema interno degrada a SIN_DATO a los 5 dias: nunca
+      consume dato viejo en silencio).
+    </p>
+  </div>
+
+</div>
+
+<div class="footer">
+  Last update: <span id="updated-at">--</span> &middot;
+  <a href="https://github.com/manumartinb/SKEW_TS_CALL_BATMAN_LT" target="_blank" rel="noopener">repo</a>
+</div>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script>
+function stalePill(latestDateStr) {
+  const el = document.getElementById('stale-pill');
+  try {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const ld = new Date(latestDateStr + 'T00:00:00');
+    const n = Math.floor((today - ld) / 86400000);
+    if (!isFinite(n) || n < 0) return;
+    el.style.display = 'inline-block';
+    if (n <= 1) { el.className = 'stale-pill ok'; el.textContent = n === 0 ? 'hoy' : 'hace 1d'; }
+    else if (n <= 4) { el.className = 'stale-pill warn'; el.textContent = 'hace ' + n + 'd'; }
+    else { el.className = 'stale-pill bad'; el.textContent = 'STALE ' + n + 'd'; }
+  } catch (e) { /* noop */ }
+}
+
+async function load() {
+  let d;
+  try {
+    const r = await fetch('data.json?_=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    d = await r.json();
+  } catch (e) {
+    document.getElementById('chart').innerHTML = '<div class="error">Error cargando data.json: ' + e.message + '</div>';
+    return;
+  }
+
+  document.getElementById('latest-date').textContent = '(' + d.latest.date + ')';
+  document.getElementById('latest-value').textContent = d.latest.pct.toFixed(1);
+  document.getElementById('latest-raw').textContent = (d.latest.raw === null) ? 'n/d' : d.latest.raw.toFixed(5);
+  const zoneEl = document.getElementById('latest-zone');
+  zoneEl.textContent = d.latest.zone;
+  zoneEl.className = 'zone ' + d.latest.zone;
+  document.getElementById('updated-at').textContent = d.generated_at;
+  stalePill(d.latest.date);
+
+  const traces = [
+    {
+      x: d.dates, y: d.pct, type: 'scatter', mode: 'lines',
+      name: 'SKEW_TS_CALL pct expanding',
+      line: { color: '#a78bfa', width: 2.2 },
+      hovertemplate: '%{x|%Y-%m-%d}<br><b>SKEW TS pct</b>: %{y:.1f}<extra></extra>',
+    },
+  ];
+
+  const layout = {
+    paper_bgcolor: '#161b22',
+    plot_bgcolor: '#161b22',
+    font: { color: '#c9d1d9', family: '-apple-system, sans-serif', size: 12 },
+    margin: { t: 40, r: 20, b: 50, l: 55 },
+    xaxis: {
+      gridcolor: '#21262d',
+      linecolor: '#30363d',
+      type: 'date',
+      rangeselector: {
+        buttons: [
+          { count: 30, label: '30D', step: 'day',  stepmode: 'backward' },
+          { count: 90, label: '90D', step: 'day',  stepmode: 'backward' },
+          { count: 1,  label: '1A',  step: 'year', stepmode: 'backward' },
+          { count: 3,  label: '3A',  step: 'year', stepmode: 'backward' },
+          { step: 'all', label: 'All' },
+        ],
+        bgcolor: '#21262d',
+        activecolor: '#6d28d9',
+        font: { color: '#c9d1d9', size: 11 },
+        bordercolor: '#30363d',
+        borderwidth: 1,
+      },
+      rangeslider: { visible: false },
+    },
+    yaxis: {
+      range: [0, 100],
+      gridcolor: '#21262d',
+      linecolor: '#30363d',
+      title: { text: 'Percentil expanding', font: { size: 12 } },
+      tickvals: [0, 20, 40, 60, 80, 95, 100],
+    },
+    shapes: [
+      { type: 'rect', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 95, y1: 100, fillcolor: '#3fb950', opacity: 0.20, line: { width: 0 }, layer: 'below' },
+      { type: 'rect', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 80, y1: 95,  fillcolor: '#1a7f37', opacity: 0.10, line: { width: 0 }, layer: 'below' },
+      { type: 'rect', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 20, y1: 80,  fillcolor: '#9a6700', opacity: 0.06, line: { width: 0 }, layer: 'below' },
+      { type: 'rect', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 0,  y1: 20,  fillcolor: '#cf222e', opacity: 0.10, line: { width: 0 }, layer: 'below' },
+      { type: 'line', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 95, y1: 95, line: { color: '#3fb950', width: 1, dash: 'dot' },  layer: 'below' },
+      { type: 'line', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 80, y1: 80, line: { color: '#1a7f37', width: 1, dash: 'dash' }, layer: 'below' },
+      { type: 'line', xref: 'paper', x0: 0, x1: 1, yref: 'y', y0: 20, y1: 20, line: { color: '#cf222e', width: 1, dash: 'dash' }, layer: 'below' },
+    ],
+    annotations: [
+      { xref: 'paper', x: 1, xanchor: 'right', yref: 'y', y: 97.5, text: 'TURBO',  font: { color: '#7ee787', size: 10 }, showarrow: false, opacity: 0.85 },
+      { xref: 'paper', x: 1, xanchor: 'right', yref: 'y', y: 87,   text: 'VERDE (acelerar)', font: { color: '#3fb950', size: 10 }, showarrow: false, opacity: 0.75 },
+      { xref: 'paper', x: 1, xanchor: 'right', yref: 'y', y: 50,   text: 'NEUTRA', font: { color: '#d29922', size: 10 }, showarrow: false, opacity: 0.7 },
+      { xref: 'paper', x: 1, xanchor: 'right', yref: 'y', y: 10,   text: 'ROJA (reducir / no abrir)', font: { color: '#f85149', size: 10 }, showarrow: false, opacity: 0.75 },
+    ],
+    legend: { orientation: 'h', y: -0.18, x: 0.5, xanchor: 'center', bgcolor: 'rgba(0,0,0,0)' },
+    hovermode: 'x unified',
+  };
+
+  if (d.dates.length > 0) {
+    const last = d.dates[d.dates.length - 1];
+    const lastDt = new Date(last);
+    const start = new Date(lastDt);
+    start.setDate(start.getDate() - 90);
+    layout.xaxis.range = [start.toISOString().slice(0, 10), last];
+  }
+
+  Plotly.newPlot('chart', traces, layout, {
+    responsive: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ['lasso2d', 'select2d', 'autoScale2d'],
+  });
+}
+load();
+</script>
+</body>
+</html>
