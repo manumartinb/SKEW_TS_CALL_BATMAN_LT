@@ -293,8 +293,10 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
     Cuando la prima del skew de CALLs esta concentrada en la expiracion <strong>BACK</strong> (donde el
     Batman LT COMPRA el body x2) y no en la front (donde VENDE los wings), la estructura compra donde la
     superficie esta sostenida y vende donde se desinfla. Formula cerrada, sin percentiles en el input:
-    <code>skew_25d_vs50[back] - skew_25d_vs50[front]</code>; el percentil expanding (solo-pasado) traduce
-    el nivel a zonas operativas.
+    <code>skew_25d_vs50[back] - skew_25d_vs50[front]</code>, donde
+    <code>skew_25d_vs50 = IV(call 25-delta) - IV(call 50-delta)</code> medido en la superficie CALL
+    del SPX (snapshot 10:30 ET, datos de opciones propios, por vencimiento estandarizado dte_target).
+    El percentil expanding (solo-pasado, sin lookahead) traduce el nivel a zonas operativas.
   </p>
   <table class="rules-table">
     <thead><tr><th>Zona</th><th>Percentil</th><th>Lectura operativa</th><th>Elite P90 backtest (Gen3 / Madre)</th></tr></thead>
