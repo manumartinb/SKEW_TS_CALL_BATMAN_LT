@@ -21,7 +21,7 @@ body {
   padding: 16px;
 }
 .obs-banner {
-  max-width: 1200px;
+  max-width: 1520px;
   margin: 0 auto 14px auto;
   background: rgba(210,153,34,0.10);
   border: 1px solid #9a6700;
@@ -35,7 +35,7 @@ body {
 .obs-banner strong { color: #f0d264; }
 .obs-banner .sub { color: #b08a2e; font-size: 12px; }
 .header {
-  max-width: 1200px;
+  max-width: 1520px;
   margin: 0 auto 16px auto;
   display: flex;
   flex-wrap: wrap;
@@ -81,7 +81,7 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
 .stale-pill.warn { background: rgba(154,103,0,0.25);   color: #d29922; }
 .stale-pill.bad  { background: rgba(207,34,46,0.25);   color: #f85149; }
 #chart {
-  max-width: 1200px;
+  max-width: 1520px;
   margin: 0 auto;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -89,7 +89,7 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
   padding: 8px;
 }
 .rules {
-  max-width: 1200px;
+  max-width: 1520px;
   margin: 18px auto;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -124,7 +124,7 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
 .rules-table tr.row-neu   td:first-child { color: #d29922; font-weight: 600; }
 .rules-table tr.row-roja  td:first-child { color: #f85149; font-weight: 600; }
 #evidence {
-  max-width: 1200px;
+  max-width: 1520px;
   margin: 28px auto 0 auto;
   display: flex;
   flex-direction: column;
@@ -197,7 +197,7 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
 .ev-kpi-tile .v { font-size: 18px; font-weight: 700; color: var(--text); }
 .ev-kpi-tile .l { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 2px; }
 .footer {
-  max-width: 1200px;
+  max-width: 1520px;
   margin: 14px auto 0 auto;
   color: var(--muted);
   font-size: 12px;
@@ -233,8 +233,62 @@ h1 { font-size: 18px; margin: 0; font-weight: 600; }
 
 <div id="chart"><div class="error">Cargando...</div></div>
 
+<div class="rules" style="border-left: 3px solid #a78bfa;">
+  <h2>Como leer y usar esta pagina (en cristiano)</h2>
+  <p>
+    <strong>Que estas viendo.</strong> Un termometro diario de UNA sola cosa: donde esta pagando el
+    mercado la prima del skew de calls del SPX. Si la paga en los vencimientos <strong>lejanos</strong>
+    (donde la estrategia Batman LT COMPRA su pata grande), el viento sopla a favor. Si la paga en los
+    <strong>cercanos</strong> (donde la estrategia VENDE), el viento sopla en contra. La linea del
+    grafico es ese "donde" traducido a percentil 0-100 contra toda su historia: 90 significa
+    "mas a favor que el 90% de los dias que hemos visto desde 2019".
+  </p>
+  <p>
+    <strong>Como se usa, paso a paso.</strong> Mira el numero grande de arriba a la derecha y su color.
+    Eso es todo lo que este semaforo te dice hoy:
+  </p>
+  <p style="padding-left: 14px;">
+    <span class="zone ROJA" style="margin-left:0">ROJA</span> &nbsp;(percentil 20 o menos) &mdash;
+    dia flojo para abrir Batman LT nuevos. Historicamente, los trades abiertos en dias rojos apenas
+    ganaron mas que una moneda al aire. No significa "vende lo que tienes": significa "hoy no pises
+    el acelerador".<br><br>
+    <span class="zone NEUTRA" style="margin-left:0">NEUTRA</span> &nbsp;(entre 20 y 80) &mdash;
+    dia normal. Opera como siempre: que decida tu criterio de seleccion de estructuras habitual.
+    Este semaforo no opina.<br><br>
+    <span class="zone VERDE" style="margin-left:0">VERDE</span> &nbsp;(80 o mas) &mdash; dia bueno
+    para dar prioridad a esta estrategia. En el backtest, los mejores trades abiertos en dias verdes
+    casi no tuvieron dias malos: el riesgo de cola se dividio entre 6 y 14.<br><br>
+    <span class="zone TURBO" style="margin-left:0">TURBO</span> &nbsp;(95 o mas) &mdash; la version
+    rara y potente del verde (~1 dia de cada 20). Historicamente, la mejor relacion
+    ganancia/sustos de todo el historico.
+  </p>
+  <p>
+    <strong>Lo que este semaforo NO hace</strong> (importante, y es a proposito):
+    (1) <strong>No elige trades</strong> &mdash; todos los candidatos de un mismo dia ven casi el mismo
+    color; para elegir ENTRE estructuras estan los scores de seleccion, no esta pagina.
+    (2) <strong>No protege en un crash</strong> &mdash; en la peor racha de la historia reciente
+    (verano 2022 a invierno 2023) este semaforo no se puso rojo a tiempo; lo que SI hizo fue no dar
+    ni un solo dia verde en 7 meses. Es un acelerador inteligente, no un freno de emergencia:
+    el freno son los filtros de regimen principales (PUT SKEW / TRIPLE_OR).
+    (3) <strong>No predice la direccion del SPX</strong> &mdash; mide la superficie de volatilidad,
+    no hacia donde va el indice.
+  </p>
+  <p>
+    <strong>La pastilla de fecha</strong> junto al numero grande te dice de cuando es el dato.
+    Si pone "hoy" o "hace 1d", perfecto (el dato se refresca cada tarde tras el cierre de datos).
+    Si se pone ambar o roja ("STALE"), el dato ha envejecido y el semaforo esta oficialmente mudo:
+    mejor sin senal que con senal caducada.
+  </p>
+  <p>
+    <strong>Y el banner amarillo de arriba</strong>: esta senal paso todas las pruebas estadisticas
+    sobre datos historicos (2019-2026), pero empezo a rodar en vivo el 7 de julio de 2026. Hasta
+    acumular meses de rodaje real, se publica como observacion &mdash; sin poder automatico sobre
+    el tamano de las posiciones. La honestidad de esa espera es parte del metodo.
+  </p>
+</div>
+
 <div class="rules">
-  <h2>Que mide y como leerlo</h2>
+  <h2>Detalle tecnico: formula y umbrales calibrados</h2>
   <p>
     Cuando la prima del skew de CALLs esta concentrada en la expiracion <strong>BACK</strong> (donde el
     Batman LT COMPRA el body x2) y no en la front (donde VENDE los wings), la estructura compra donde la
@@ -421,6 +475,7 @@ async function load() {
     paper_bgcolor: '#161b22',
     plot_bgcolor: '#161b22',
     font: { color: '#c9d1d9', family: '-apple-system, sans-serif', size: 12 },
+    height: 560,
     margin: { t: 40, r: 20, b: 50, l: 55 },
     xaxis: {
       gridcolor: '#21262d',
